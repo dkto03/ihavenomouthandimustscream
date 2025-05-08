@@ -22,7 +22,7 @@
       p.draw = function() {
         // Check for successful input and transition after 2 seconds
         if (correctInput && p.millis() - successTime > 2000) {
-          window.location.href = "you.js";
+          window.location.href = "laughter.html";
           return;
         }
         
