@@ -7,8 +7,9 @@ let fadeAlpha = 0;
 let currentState = 'splash'; // 'splash' or 'text'
 
 function preload() {
-  heart = loadSound('heartbeat.mp3');
-  AM = loadImage('AM-tower.png');
+  heart = loadSound('audio/heartbeat.mp3');
+  AM = loadImage('imgs/AM-tower.png');
+  createCanvas(windowWidth, windowHeight);
 }
 
 function setup() {
@@ -121,14 +122,15 @@ function drawGlitchyQuestionMark() {
 }
 
 function mousePressed() {
-  // Check if clicking near question mark (when visible)
-  if (showQuestionMark) {
-    let qMarkX = width/2;
-    let qMarkY = height/2 + 100;
-    if (dist(mouseX, mouseY, qMarkX, qMarkY) < 30) {
-      // Go to next sketch (change filename as needed)
-      window.location.href = "sketch2.js";
-    }
+  if (showQuestionMark && dist(mouseX, mouseY, width/2, height/2 + 100) < 30) {
+    // Clean up before loading next sketch
+    heart.stop();
+    remove();
+    
+    // Load next sketch
+    let script = document.createElement('script');
+    script.src = 'sketch2.js';
+    document.head.appendChild(script);
   }
 }
 

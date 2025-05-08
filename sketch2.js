@@ -1,32 +1,18 @@
-let newContent;
+// sketch2.js - Minimal version for your transition
+(function() {
+  new p5(function(p) {
+    p.setup = function() {
+      let canvas = p.createCanvas(p.windowWidth, p.windowHeight);
+      canvas.parent('sketch-container');
+      p.background(0); // Black background
+      p.fill(255); // White text
+      p.textSize(32);
+      p.textAlign(p.CENTER, p.CENTER);
+      p.text("I begin to hate", p.width/2, p.height/2);
+    };
 
-function preload() {
-  // Load assets for this sketch
-  newContent = loadImage('assets/images/new-content.png');
-}
-
-function setup() {
-  createCanvas(windowWidth, windowHeight);
-  imageMode(CENTER);
-  
-  // Your sketch2 content
-  background(0);
-  fill(255);
-  textSize(32);
-  text("Welcome to the second part of the experience", width/2, height/2);
-  
-  // Example interactive element
-  newContent.resize(300, 0);
-  image(newContent, width/2, height/2 + 100);
-}
-
-function draw() {
-  // Your animation/drawing code for sketch2
-}
-
-function mousePressed() {
-  // Example interaction
-  if (dist(mouseX, mouseY, width/2, height/2 + 100) < 150) {
-    window.location.href = "sketch3.html"; // Link to next sketch
-  }
-}
+    p.windowResized = function() {
+      p.resizeCanvas(p.windowWidth, p.windowHeight);
+    };
+  });
+})();
