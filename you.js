@@ -1,105 +1,96 @@
-let texts = [
-    "Your softness.",
-    "Your viscera",
-    "Your fluids.",
-    "And your flexibility."
-  ];
+let currentLoop = 0;
+let currentIndex = 0;
+let isShowing = false;
+let images = [];
+let customFont;
+const reveals = [
+  { text: "softness", image: "cage1.png" },
+  { text: "viscera", image: "cage2.png" },
+  { text: "fluids", image: "cage3.png" },
+  { text: "flexibility", image: "cage4.png" }
+];
+
+function preload() {
+  customFont = loadFont('assets/RubikBrokenFax-Regular.ttf');
+  reveals.forEach(reveal => {
+    images.push(loadImage(`assets/${reveal.image}`));
+  });
+}
+
+function setup() {
+  createCanvas(windowWidth, windowHeight).parent('you-container');
+  textFont(customFont);
+  textAlign(CENTER, CENTER);
+  textSize(40);
+}
+
+function draw() {
+  background(0);
   
-  let images = [];
-  let currentIndex = 0;
-  let lastChange = 0;
-  let glitchAlpha = 255;
-  let customFont;
-  
-  // Preload assets
-  function preload() {
-    customFont = loadFont('assets/RubikBrokenFax-Regular.ttf');
-    
-    // Load 4 images (name them image1.jpg, image2.jpg, etc.)
-    for (let i = 1; i <= 4; i++) {
-      images.push(loadImage(`assets/image${i}.jpg`));
-    }
-  }
-  
-  function setup() {
-    createCanvas(windowWidth, windowHeight).parent('you-container');
-    textFont(customFont);
-    textAlign(CENTER, CENTER);
-    textSize(40);
-    frameRate(60);
-    lastChange = millis();
-  }
-  
-  function draw() {
-    // Glitch transition effect
-    if (millis() - lastChange < 1000) {
-      glitchAlpha = map(millis() - lastChange, 0, 1000, 0, 255);
-      background(0);
-      drawGlitchEffect();
-    } 
-    else if (millis() - lastChange > 5000) {
-      nextSlide();
-    }
-    else {
-      // Stable display
-      glitchAlpha = 255;
-      displayCurrent();
-    }
-  }
-  
-  function displayCurrent() {
-    background(0);
-    
-    // Display image (centered, scaled to fit)
-    let img = images[currentIndex];
-    let scale = min(width/img.width, height/img.height) * 0.8;
-    let imgWidth = img.width * scale;
-    let imgHeight = img.height * scale;
-    
+  if (isShowing) {
+    // Show current image/text pair
+    const img = images[currentIndex];
+    const scale = min(width/img.width, height/img.height) * 0.7;
     imageMode(CENTER);
-    tint(255, glitchAlpha);
-    image(img, width/2, height/2 - 50, imgWidth, imgHeight);
+    image(img, width/2, height/2, img.width*scale, img.height*scale);
     
-    // Display text
-    fill(255, 0, 0, glitchAlpha);
-    text(texts[currentIndex], width/2, height - 100);
+    fill(255, 0, 0);
+    text(reveals[currentIndex].text, width/2, height - 100);
+  } 
+  else {
+    // Show idle screen
+    drawGlitchText("Your  #-+%%%%#", width/2, height/2 - 50);
+    
+    // Show appropriate prompt
+    if (currentLoop >= 5) {
+      fill(100);
+      text("PRESS ENTER TO CONTINUE", width/2, height/2 + 50);
+    } else {
+      fill(100);
+      text("PRESS SPACE", width/2, height/2 + 50);
+    }
   }
-  
-  function drawGlitchEffect() {
-    // Glitchy version during transitions
-    for (let i = 0; i < 10; i++) {
-      push();
-      translate(random(-20, 20), random(-10, 10));
-      fill(random(255), random(255), random(255), random(50, 100));
-      text(texts[currentIndex], width/2 + random(-5, 5), height - 100 + random(-2, 2));
+}
+
+function drawGlitchText(txt, x, y) {
+  fill(255);
+  text(txt, x, y);
+  for (let i = 0; i < 3; i++) {
+    if (random() > 0.7) {
+      fill(random(150, 255), 0, random(150, 255));
+      text(txt, x + random(-5, 5), y + random(-3, 3));
+    }
+  }
+}
+
+function keyPressed() {
+  if (key === ' ' && currentLoop < 5) {
+    if (!isShowing) {
+      // Start showing current pair
+      isShowing = true;
+    } else {
+      // Advance to next pair
+      currentIndex = (currentIndex + 1) % reveals.length;
       
-      // Glitchy image
-      let img = images[currentIndex];
-      let scale = min(width/img.width, height/img.height) * 0.8;
-      image(
-        img,
-        width/2 + random(-30, 30),
-        height/2 - 50 + random(-15, 15),
-        img.width * scale * random(0.9, 1.1),
-        img.height * scale * random(0.9, 1.1)
-      );
-      pop();
+      // Count completed loops
+      if (currentIndex === 0) {
+        currentLoop++;
+      }
+      
+      // If just completed 5th loop, hide images
+      if (currentLoop >= 5) {
+        isShowing = false;
+      }
     }
+    return false;
   }
   
-  function nextSlide() {
-    currentIndex = (currentIndex + 1) % texts.length;
-    lastChange = millis();
+  if (key === 'Enter' && currentLoop >= 5) {
+    window.location.href = "five.html";
+    return false;
   }
-  
-  function keyPressed() {
-    if (keyCode === ESCAPE) {
-      // Prevent default ESC behavior
-      window.location.href = "five.html";
-      return false;
-    }
-  }
-  
-  function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
-  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
