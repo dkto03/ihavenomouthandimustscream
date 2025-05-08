@@ -12,8 +12,8 @@ let lastGlitchTime = 0;
 let splashStartTime;
 
 function preload() {
-  heart = loadSound('audio/heartbeat.mp3');
-  AM = loadImage('imgs/AM-tower.png');  
+  heart = loadSound('assets/heartbeat.mp3');
+  AM = loadImage('assets/AM-tower.png');  
 }
 
 function setup() {
@@ -161,7 +161,7 @@ function mousePressed() {
     
     // Load next sketch
     let script = document.createElement('script');
-    script.src = 'sketch2.js';
+    script.src = 'hate.js';
     document.head.appendChild(script);
   }
 }
