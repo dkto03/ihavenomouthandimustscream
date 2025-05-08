@@ -111,12 +111,26 @@ function draw() {
     }
   });
   
-  // Transition when all are gone
-  if (visibleCount === 0) {
-    setTimeout(() => {
-      window.location.href = "you.html";
-    }, 10);
+// REPLACE your current transition code in laughter.js with this:
+
+function checkHACount() {
+    const visibleCount = haElements.filter(ha => ha.isVisible).length;
+    
+    if (visibleCount === 0) {
+      // 1. Create iframe to preload you.html silently
+      const preloader = document.createElement('iframe');
+      preloader.style.display = 'none';
+      preloader.src = 'you.html';
+      document.body.appendChild(preloader);
+      
+      // 2. INSTANT cut (no delay)
+      window.location.replace("you.html"); 
+      // Note: replace() prevents back-button issues
+    }
   }
+  
+  // Call this in your draw() loop instead of setTimeout:
+  checkHACount();
 }
 
 function windowResized() {
