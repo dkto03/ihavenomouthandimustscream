@@ -9,7 +9,7 @@
       canvas.parent('sketch-container');
       p.textSize(32);
       p.textAlign(p.CENTER, p.CENTER);
-      p.textFont('Courier New');
+      p.textFont('Rubik Broken Fax');
       lastMouseX = p.mouseX;
     };
 
@@ -26,7 +26,7 @@
       
       // Base text (always visible)
       p.fill(255, 0, 0, fadeAlpha);
-      p.text("I begin to hate", p.width/2, p.height/2);
+      p.text("And I begin to hate", p.width/2, p.height/2);
       
       // Glitch layer (intensity based on mouse movement)
       if(glitchIntensity > 1) {

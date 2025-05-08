@@ -1,145 +1,153 @@
 let showQuestionMark = false;
 let questionGlitch = 0;
-let heart;
-let AM;
+let heart, AM;
 let pulseSize = 1;
 let fadeAlpha = 0;
 let currentState = 'splash';
 let heartRate = 60;
+let customFont;
+let heartBeatSize = 32;
+let imgGlitch = 0; // For image glitch effects
+let lastGlitchTime = 0;
+let splashStartTime;
 
 function preload() {
   heart = loadSound('audio/heartbeat.mp3');
-  AM = loadImage('imgs/AM-tower.png');
+  AM = loadImage('imgs/AM-tower.png');  
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(windowWidth, windowHeight).parent('sketch-container');
   imageMode(CENTER);
   textAlign(CENTER, CENTER);
-  textFont('Courier New');
-  noStroke();
+  customFont = 'Rubik Broken Fax';
 
   heart.loop();
-  heart.rate(1.0); // Normal speed
   heart.setVolume(0.7);
+
+  if (customFont) textFont(customFont);
+  else textFont('Courier New');
+
+  noStroke();
+
+  splashStartTime = millis(); // record when the splash starts
 }
+
+function handleSplashTransition() {
+  if (millis() - splashStartTime > 3000) {
+    fadeAlpha += 5;
+    fill(0, fadeAlpha);
+    rect(0, 0, width, height);
+
+    if (fadeAlpha >= 255) {
+      currentState = 'text';
+    }
+  }
+}
+
 
 function draw() {
   background(0);
+  
+  // Text pulse synced to heartbeat (more dramatic)
+  heartBeatSize = map(sin(frameCount * 0.2), -1, 1, 30, 36);
   
   if (currentState === 'splash') {
     drawSplash();
     handleSplashTransition();
   } else {
     drawTextScene();
+    if (showQuestionMark) drawGlitchyQuestionMark();
   }
 }
 
-function updateHeartRate() {
-  // Increase heart rate when hovering interactive elements
-  let targetBPM = 60; // Base rate
-  
-  if (currentState === 'text') {
-    if (isHovering(width/2, height/2 + 40, "And I must scream")) {
-      targetBPM = 120; // Faster when hovering important text
-    } else if (showQuestionMark) {
-      targetBPM = 90; // Elevated when question mark visible
-    }
-  }
-  
-  // Smooth transition
-  heartRate = lerp(heartRate, targetBPM, 0.05);
-  
-  // Map BPM to playback rate (60bpm = 1.0, 120bpm = 2.0)
-  heart.rate(map(heartRate, 60, 120, 1.0, 2.0));
-}
-
+// GLITCHY IMAGE EFFECT (Replaces old pulsing)
 function drawSplash() {
-  let sizePulse = sin(frameCount * 0.1) * 0.05 + 1;  
-  push();
-  translate(width/2, height/2);
-  scale(sizePulse);
-  image(AM, 0, 0, 400, 400);
-  pop();
-}
-
-function handleSplashTransition() {
-  if (frameCount > 100) {
-    fadeAlpha += 2;
-    if (fadeAlpha >= 255) {
-      currentState = 'text';
+  // Base image with random glitch offsets
+  if (random() > 0.1) { // 90% chance to draw normally
+    push();
+    translate(width/2, height/2);
+    
+    // Random glitch transforms
+    if (millis() - lastGlitchTime > 1000 && random() > 0.7) {
+      imgGlitch = random(0.9, 1.1);
+      lastGlitchTime = millis();
     }
+    
+    scale(imgGlitch);
+    rotate(random(-0.05, 0.05));
+    image(AM, random(-5, 5), random(-5, 5), 400, 400);
+    pop();
   }
-  fill(0, fadeAlpha);
-  rect(0, 0, width, height);
+  
+  // 10% chance for full glitch frame
+  if (random() > 0.9) {
+    push();
+    translate(width/2, height/2);
+    tint(255, 50, 50, 150);
+    image(AM, random(-20, 20), random(-10, 10), 450, 450);
+    noTint();
+    pop();
+  }
 }
 
+// TEXT WITH HEARTBEAT EFFECT
 function drawTextScene() {
   background(0, 128);
-  
-   hoveredLine1 = isHovering(width/2, height/2 - 40, "I have no mouth");
-  
-  // Draw first line
-  textSize(32);
-  if (hoveredLine1) {
-    fill(200, 0, 0);
-    textSize(34);
+
+  let glitchIntensity = map(heartRate, 60, 120, 0, 10);
+
+  // First line
+  if (isHovering(width/2, height/2 - 40, "I have no mouth")) {
+    drawGlitchText("I have no mouth", width/2, height/2 - 40, glitchIntensity + 5);
   } else {
-    fill(255);
+    drawGlitchText("I have no mouth", width/2, height/2 - 40, glitchIntensity);
   }
-  text("I have no mouth", width/2, height/2 - 40);
-  
-  // Check if mouse is over second line
+
+  // Second line
   let secondLineHover = isHovering(width/2, height/2 + 40, "And I must scream");
-  
-  // Show question mark when second line is hovered
   if (secondLineHover) {
     showQuestionMark = true;
-  }
-  
-  // Draw first line
-  textSize(32);
-  fill(255);
-  text("I have no mouth", width/2, height/2 - 40);
-  
-  // Draw second line (with hover effect)
-  if (secondLineHover) {
-    fill(200, 0, 0);
-    textSize(34);
+    drawGlitchText("And I must scream", width/2, height/2 + 40, glitchIntensity + 10);
   } else {
-    fill(255);
-    textSize(32);
-  }
-  text("And I must scream", width/2, height/2 + 40);
-  
-  // Draw question mark if second line was hovered
-  if (showQuestionMark) {
-    drawGlitchyQuestionMark();
+    drawGlitchText("And I must scream", width/2, height/2 + 40, glitchIntensity);
   }
 }
 
+function drawGlitchText(txt, x, y, intensity) {
+  textSize(32);
+  fill(255);
+  text(txt, x, y); // Base layer
+
+  // Glitch layers
+  for (let i = 0; i < 3; i++) {
+    if (random() > 0.5) {
+      let xOffset = random(-intensity, intensity);
+      let yOffset = random(-intensity, intensity);
+      fill(random(100, 255), random(100, 255), random(100, 255), 150);
+      text(txt, x + xOffset, y + yOffset);
+    }
+  }
+}
+
+// ENHANCED GLITCH QUESTION MARK
 function drawGlitchyQuestionMark() {
-  questionGlitch += 0.05;
   let baseX = width/2;
   let baseY = height/2 + 100;
-  let glitchAmount = map(sin(questionGlitch), -1, 1, 0, 10); // Reduced glitch intensity
   
-  // Draw question mark with slight glitch
-  push();
-  translate(baseX + random(-glitchAmount, glitchAmount), 
-           baseY + random(-glitchAmount, glitchAmount));
+  // Base question mark with pulse
+  textSize(48 * map(heartRate, 60, 120, 1, 1.5));
   fill(255);
-  textSize(48);
-  text("?", 0, 0);
-  pop();
+  text("?", baseX, baseY);
   
-  // Optional: Add occasional bigger glitch
-  if (random() > 0.97) {
+  // Glitch layer (intensity tied to heart rate)
+  if (random() > 0.7) {
     push();
-    translate(baseX, baseY);
-    rotate(random(-0.1, 0.1));
-    fill(255, 50, 50);
-    textSize(55);
+    translate(
+      baseX + random(-heartRate/5, heartRate/5),
+      baseY + random(-10, 10)
+    );
+    fill(random(255), random(255), random(255));
     text("?", 0, 0);
     pop();
   }
