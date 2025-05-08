@@ -44,7 +44,7 @@ function draw() {
     // Show appropriate prompt
     if (currentLoop >= 5) {
       fill(100);
-      text("PRESS ENTER TO CONTINUE", width/2, height/2 + 50);
+      text("PRESS SHIFT", width/2, height/2 + 50);
     } else {
       fill(100);
       text("PRESS SPACE", width/2, height/2 + 50);
@@ -85,7 +85,7 @@ function keyPressed() {
     return false;
   }
   
-  if (key === 'Enter' && currentLoop >= 5) {
+  if (key === 'Shift' && currentLoop >= 5) {
     window.location.href = "five.html";
     return false;
   }
