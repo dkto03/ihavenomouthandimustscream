@@ -115,7 +115,7 @@ function draw() {
   if (visibleCount === 0) {
     setTimeout(() => {
       window.location.href = "you.html";
-    }, 1000);
+    }, 10);
   }
 }
 
