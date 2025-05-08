@@ -4,19 +4,24 @@ let heart;
 let AM;
 let pulseSize = 1;
 let fadeAlpha = 0;
-let currentState = 'splash'; // 'splash' or 'text'
+let currentState = 'splash';
+let heartRate = 60;
 
 function preload() {
   heart = loadSound('audio/heartbeat.mp3');
   AM = loadImage('imgs/AM-tower.png');
-  createCanvas(windowWidth, windowHeight);
 }
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   imageMode(CENTER);
   textAlign(CENTER, CENTER);
+  textFont('Courier New');
   noStroke();
+
+  heart.loop();
+  heart.rate(1.0); // Normal speed
+  heart.setVolume(0.7);
 }
 
 function draw() {
@@ -30,6 +35,25 @@ function draw() {
   }
 }
 
+function updateHeartRate() {
+  // Increase heart rate when hovering interactive elements
+  let targetBPM = 60; // Base rate
+  
+  if (currentState === 'text') {
+    if (isHovering(width/2, height/2 + 40, "And I must scream")) {
+      targetBPM = 120; // Faster when hovering important text
+    } else if (showQuestionMark) {
+      targetBPM = 90; // Elevated when question mark visible
+    }
+  }
+  
+  // Smooth transition
+  heartRate = lerp(heartRate, targetBPM, 0.05);
+  
+  // Map BPM to playback rate (60bpm = 1.0, 120bpm = 2.0)
+  heart.rate(map(heartRate, 60, 120, 1.0, 2.0));
+}
+
 function drawSplash() {
   let sizePulse = sin(frameCount * 0.1) * 0.05 + 1;  
   push();
@@ -40,7 +64,7 @@ function drawSplash() {
 }
 
 function handleSplashTransition() {
-  if (frameCount > 180) {
+  if (frameCount > 100) {
     fadeAlpha += 2;
     if (fadeAlpha >= 255) {
       currentState = 'text';
@@ -144,5 +168,3 @@ function isHovering(x, y, txt) {
     mouseY < y + tHeight/2
   );
 }
-
-//another test boo
