@@ -127,7 +127,7 @@ function mousePressed() {
     let qMarkY = height/2 + 100;
     if (dist(mouseX, mouseY, qMarkX, qMarkY) < 30) {
       // Go to next sketch (change filename as needed)
-      window.location.href = "next-sketch.html";
+      window.location.href = "sketch2.js";
     }
   }
 }
